@@ -32,6 +32,13 @@ Challenge Instructions: [techindicium/code-challenge](https://github.com/techind
    docker-compose up -d
 ```
 
+<br>
+
+**3.** If you change any database credentials in the `docker-compose.yml` file, be sure to change them in `scripts/configs.py` as well.<br>
+
+Also, you can change the CSV source path in configs.py too, but keep the filename. The path and file name of the query result can be changed as well.
+
+
 ## Usage
 
 ```lua
