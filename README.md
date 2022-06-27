@@ -18,26 +18,23 @@ Challenge Instructions: [techindicium/code-challenge](https://github.com/techind
 
 * Python 3
 * Docker-compose
-* Psycopg2
 
 ## Setup
 
-**1.** Install **psycopg2** on a venv or globally.
+**1.** Install the dependencies.
 ```sh
-  pip install psycopg2
+  pip install -r requirements.txt
 ```
 
-**2.** Initialize the Postgres databases.
+**2.** Initialize the **postgres** databases.
 ```sh
    docker-compose up -d
 ```
 
+
+**3.** You can configure some things in the `.env` file.
+
 <br>
-
-**3.** If you change any database credentials in the `docker-compose.yml` file, be sure to change them in `scripts/configs.py` as well.<br>
-
-Also, you can change the CSV source path in configs.py too, but keep the filename. The path and file name of the query result can be changed as well.
-
 
 ## Usage
 

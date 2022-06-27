@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import os
 from pathlib import Path
 import csv as csv_module
@@ -7,7 +6,9 @@ from glob import glob
 from scripts._database import Database
 from scripts.message_utils import skip_operation, output_message, sucess
 from scripts.constants import SQL, OUTPUT_FILE_NAME_PATTERN, CSV_FOLDER_PATTERN, POSTGRES_FOLDER_PATTERN
-from scripts.configs import STATIC_CSV_PATH, SOURCE_DB_CREDENTIALS
+from scripts._db_credentials import source_db_credentials
+
+STATIC_CSV_PATH = os.getenv("STATIC_CSV_PATH")
 
 def _convert_csv_delimiter_and_copy(from_, to):
      with open(from_) as source_csv:
@@ -37,14 +38,12 @@ class Extractor():
         output_message("CSV")
         
         if not os.path.exists(STATIC_CSV_PATH):
-            skip_operation("NO_SOURCE_CSV", path=STATIC_CSV_PATH)
-            return False
+            return skip_operation("NO_SOURCE_CSV", path=STATIC_CSV_PATH)
 
         target_path = Path(CSV_FOLDER_PATTERN.format(date=self.target_date))
 
         if os.path.exists(target_path):
-            skip_operation("CSV_EXIST", date=self.target_date)
-            return False
+            return skip_operation("CSV_EXIST", date=self.target_date)
 
         os.makedirs(target_path)
 
@@ -67,10 +66,9 @@ class Extractor():
 
         path_pattern = f"./data/postgres/*/{self.target_date}"
         if len(glob(path_pattern)) > 0:
-            skip_operation("CSV_TABLES_EXIST", date=self.target_date)
-            return False
+            return skip_operation("CSV_TABLES_EXIST", date=self.target_date)
 
-        source_db = Database(credentials_obj=SOURCE_DB_CREDENTIALS)
+        source_db = Database(credentials_obj=source_db_credentials)
         table_list = source_db.list_tables()
 
         for table_name in table_list:

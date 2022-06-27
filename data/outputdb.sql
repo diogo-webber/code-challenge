@@ -1,6 +1,6 @@
 
 -- This a copy of the northwind.sql file, with the addition of the order_details table,
--- without inserting data and removing Constraints.
+-- without data and constraints.
 
 --
 -- PostgreSQL database dump

@@ -1,11 +1,12 @@
-#!/usr/bin/env python
 import os
 from glob import glob
 
 from scripts._database import Database
 from scripts.constants import SQL
-from scripts.configs import OUTPUT_DB_CREDENTIALS, RESULT_QUERY_FILE_NAME
+from scripts._db_credentials import output_db_credentials
 from scripts.message_utils import skip_operation, output_message, sucess
+
+RESULT_QUERY_PATH = os.getenv("RESULT_QUERY_PATH")
 
 def _collect_csv_for_date(date: str):
     return glob(f"./data/**/{date}/*.csv", recursive=True)
@@ -31,11 +32,10 @@ class Importer():
         output_message("IMPORT")
 
         files = _collect_csv_for_date(self.target_date)
-        if len(files) == 0:
-            print(f"Não há dados disponiveis para a data \"{self.target_date}\".")
-            return False
+        if len(files) < 5:
+            return skip_operation("IMPORT_NO_DATA", date=self.target_date)
 
-        self.target_db = Database(credentials_obj=OUTPUT_DB_CREDENTIALS)
+        self.target_db = Database(credentials_obj=output_db_credentials)
         self.target_db.clear_tables()
 
         for csv in files:
@@ -58,18 +58,17 @@ class Importer():
             `sucess`: bool - whether the export was successful.
         """
 
-        output_message("QUERY", name=RESULT_QUERY_FILE_NAME)
+        output_message("QUERY", name=RESULT_QUERY_PATH)
 
-        self.target_db = Database(credentials_obj=OUTPUT_DB_CREDENTIALS)
+        self.target_db = Database(credentials_obj=output_db_credentials)
 
         self.target_db.run_sql(SQL.SELECT_FINAL_QUERY)
 
         if len(self.target_db.cur.fetchall()) == 0:
-            skip_operation("QUERY_NO_DATA")
             self.target_db.close_connection()
-            return False
+            return skip_operation("QUERY_NO_DATA")
 
-        with open(f"./{RESULT_QUERY_FILE_NAME}.csv", "w") as file:
+        with open(RESULT_QUERY_PATH, "w") as file:
             self.target_db.execute_copy(SQL.FINAL_QUERY, file)
 
         self.target_db.close_connection()

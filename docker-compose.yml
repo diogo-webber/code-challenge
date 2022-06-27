@@ -1,5 +1,8 @@
 version: '3'
 
+# Don't change the services names.
+# The rest is configurable. 
+
 services:
   source_db:
     image: postgres:12

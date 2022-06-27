@@ -7,15 +7,6 @@ def _get_table_names(cur):
     cur.execute(SQL.LIST_TABLES)
     return [row[0] for row in cur.fetchall()]
 
-def _create_dsn_string(db) -> str:
-    return f"""
-        host={db.HOST} 
-        dbname={db.NAME} 
-        user={db.USER} 
-        password={db.PASSWORD} 
-        port={db.PORT}
-    """
-
 class Database():
     """Create a Postgres database connection."""
     def __init__(self, credentials_obj) -> None:
@@ -23,17 +14,23 @@ class Database():
         Parameters:
             `credentials_obj` - One of the classes of configs.py
         """
-        self.name = credentials_obj.NAME
-        self.credentials_dsn = _create_dsn_string(credentials_obj)
+        self.name = credentials_obj.db_name
+        self.credentials_dsn = credentials_obj.dns
         self.conn = self._connect()
         self.cur = self.conn.cursor()
 
     def _connect(self):
         try:
             return psycopg2.connect(self.credentials_dsn)
-        except Exception as e:
-            fatal_error("DB_CONNECT", db_name=self.name, error=str(e))
-
+        except Exception as error:
+            error_str = str(error)
+            if error_str.find("Is the server running") != -1:
+                fatal_error("DB_OFFLINE", db_name=self.name)
+            elif error_str.find("server terminated abnormally") != -1:
+                fatal_error("DB_LOADING",  db_name=self.name)
+            else:
+                fatal_error("DB_FAIL", error=error_str)
+                
     def _sql_wrapper(self, fn):
         try:
             query = fn(self.cur)
