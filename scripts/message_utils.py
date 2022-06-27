@@ -1,20 +1,24 @@
 import sys
-from os import get_terminal_size
-    
+from os import get_terminal_size, getenv
+
+_can_handle_colours = getenv("TERM") or getenv("TERM_PROGRAM")
+
+def colour(code):
+    return f'\u001b[{code}m'
+
 class cc():
     """Console Colours"""
-    RED = '\u001b[31m'
-    YELLOW = '\u001b[33;1m'
-    GREEN = '\u001b[38;5;40m'
-    RESET = '\u001b[0m'
+    RED = colour('31')
+    YELLOW = colour('33;1')
+    GREEN = colour('38;5;40')
+    RESET = colour('0')
 
 def _tint(str, colour):
-    return colour + str + cc.RESET
+    return _can_handle_colours and colour + str + cc.RESET or str
 
 def _tint_kwargs(kwargs, colour):
     for k, v in kwargs.items():
-        v = str(v)
-        v.replace('"', '')
+        v =  str(v) and v.replace("'", '')
         kwargs[k] = _tint('"'+ v +'"', colour)
     
     return kwargs
