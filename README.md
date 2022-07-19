@@ -94,7 +94,7 @@ To get full usage info use:
 
 <br>
 
-> #### Why postgrees database?
+> #### Why postgres database?
 > * Since the source database is on postgres, it's convenient use just one external library to manipulate them.<br>
 > #### Why CSV format for the query result and extracted files?
 > * Table type data is better represented in CSV files than in JSON or similar.<br>
