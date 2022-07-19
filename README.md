@@ -2,7 +2,7 @@
 
 # Indicium Tech - Code Challenge
 
-> Indicium code challenge 2021 for Software Developer focusing on data projects.
+> Indicium code challenge 2021/2022 for Software Developer focusing on data projects.
 
 Challenge Instructions: [techindicium/code-challenge](https://github.com/techindicium/code-challenge)
 
@@ -13,11 +13,13 @@ Challenge Instructions: [techindicium/code-challenge](https://github.com/techind
 * Extracts data from CSV file and Postgres database tables;
 * Import them to a new Postgres database;
 * Generate a CSV file joining the tables **orders** and **order_details**.
+<br>
 
 ## Prerequisites
 
-* Python 3
+* Python >=3.9
 * Docker-compose
+<br>
 
 ## Setup
 
@@ -25,12 +27,14 @@ Challenge Instructions: [techindicium/code-challenge](https://github.com/techind
 ```sh
   pip install -r requirements.txt
 ```
+<br>
 
 **2.** Initialize the **postgres** databases.
 ```sh
    docker-compose up -d
 ```
 
+<br>
 
 **3.** You can configure some things in the `.env` file.
 
@@ -66,7 +70,7 @@ To choose a date for the operations (year-month-day format):
 ```
 
 **Exemple:**
-> Import the data into the database and generate the CSV with the query, targeting the date June 25, 2022:
+> Load the data extracted into the new database and generate the CSV file with the query result, targeting the date June 25, 2022:
 
 ```sh
    python main.py -l -q -d 2022-06-25
@@ -79,12 +83,33 @@ To get full usage info use:
    python main.py -h
 ```
 
+<br>
+
 ---
 
-### What I've learned with this project?
+<br>
 
-* It increased my experience with SQL.
-* Taught me how to extract and load databases from/to CSV.
-* Allowed me to develop a CLI in python.
-* Exercised my ability to document code.
-* Made me gain experience in error handling.
+<details>
+<summary><h2>Explaining/basing my decisions:<h2></summary>
+
+<br>
+
+> #### Why postgrees database?
+> * Since the source database is on postgres, it's convenient use just one external library to manipulate them.<br>
+> #### Why CSV format for the query result and extracted files?
+> * Table type data is better represented in CSV files than in JSON or similar.<br>
+> #### Why is the name of extract files in the format: <i>table_{table}_{date}</i>?
+> * This format, with all the information, allows the file to be copied to another location while keeping all necessary information.<br>
+
+</details>
+
+<details>
+<summary><h2>What I've learned with this project?<h2></summary>
+
+   > * It increased my experience with SQL.
+   > * Taught me how to extract and load databases from/to CSV.
+   > * Allowed me to develop a CLI in python.
+   > * Exercised my ability to document code.
+   > * Made me gain experience in error handling.
+
+</details>

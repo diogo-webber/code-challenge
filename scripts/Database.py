@@ -1,36 +1,51 @@
 import psycopg2
 
 from scripts.constants import SQL
-from scripts.message_utils import fatal_error
+from scripts.Printer import Printer
+
+def _handle_connection_error(db_name, error):
+    error_str = str(error)
+    id_ = None
+    
+    if error_str.find("Is the server running") != -1:
+        id_ = "DB_OFFLINE"
+
+    elif error_str.find("server terminated abnormally") != -1:
+        id_ = "DB_LOADING"
+
+    if id_:
+        return Printer.fatal_error(id_, db_name=db_name)
+
+    return Printer.fatal_error("DB_FAIL", error=error_str)
 
 def _get_table_names(cur):
     cur.execute(SQL.LIST_TABLES)
     return [row[0] for row in cur.fetchall()]
 
 class Database():
-    """Create a Postgres database connection."""
+    """
+    Create a Postgres database connection.
+    
+    Parameters:
+        `credentials_obj`: _DBCredentials - a database credential object.
+    """
+    
     def __init__(self, credentials_obj) -> None:
-        """
-        Parameters:
-            `credentials_obj` - One of the classes of configs.py
-        """
         self.name = credentials_obj.db_name
-        self.credentials_dsn = credentials_obj.dns
-        self.conn = self._connect()
-        self.cur = self.conn.cursor()
+        self.credentials_dsn = credentials_obj.dsn
+        
+        self.conn = None
+        self.cur = None
 
-    def _connect(self):
+    def connect(self):
+        """Create the connection with the database."""
         try:
-            return psycopg2.connect(self.credentials_dsn)
-        except Exception as error:
-            error_str = str(error)
-            if error_str.find("Is the server running") != -1:
-                fatal_error("DB_OFFLINE", db_name=self.name)
-            elif error_str.find("server terminated abnormally") != -1:
-                fatal_error("DB_LOADING",  db_name=self.name)
-            else:
-                fatal_error("DB_FAIL", error=error_str)
-                
+            self.conn = psycopg2.connect(self.credentials_dsn)
+            self.cur = self.conn.cursor()
+        
+        except Exception as e:
+            _handle_connection_error(db_name=self.name, error=e)
+
     def _sql_wrapper(self, fn):
         try:
             query = fn(self.cur)
@@ -76,6 +91,7 @@ class Database():
         return self._sql_wrapper(fn=_get_table_names)
 
     def close_connection(self):
-        """Close the connection with the database."""
-        self.cur.close()
-        self.conn.close()
+        """Close the connection with the database if exist."""
+        if self.conn:
+            self.cur.close()
+            self.conn.close()
