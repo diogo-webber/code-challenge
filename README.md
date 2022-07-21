@@ -94,6 +94,8 @@ To get full usage info use:
 
 <br>
 
+> #### Why Python?
+> * Python, in addition to being a language I know well, is great for the data area and perfect for simple scripts..<br>
 > #### Why postgres database?
 > * Since the source database is on postgres, it's convenient use just one external library to manipulate them.<br>
 > #### Why CSV format for the query result and extracted files?
